@@ -36,7 +36,7 @@ class Utils {
             if (platform === "darwin" && (lowerUrl.endsWith(".dmg") || lowerUrl.endsWith(".zip"))) {
                 return url;
             }
-            if (platform === "win32" && (lowerUrl.endsWith(".exe") || lowerUrl.includes("setup"))) {
+            if (platform === "win32" && (lowerUrl.endsWith(".exe") || lowerUrl.includes("setup") || lowerUrl.includes("win32"))) {
                 return url;
             }
             if (platform === "linux" && (lowerUrl.endsWith(".deb") || lowerUrl.endsWith(".appimage") || lowerUrl.endsWith(".rpm"))) {
