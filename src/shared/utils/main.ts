@@ -48,6 +48,12 @@ class Utils {
     }
 
     private async downloadUpdate(downloadUrls: string[]) {
+        // Abort any previous download before starting a new one
+        if (this.downloadAbortController) {
+            this.downloadAbortController.abort();
+            this.downloadAbortController = null;
+        }
+
         const url = this.getDownloadUrlForPlatform(downloadUrls);
         if (!url) {
             this.sendUpdateEvent("@shared/utils/update-download-error", "未找到适用于当前平台的安装包");
@@ -58,12 +64,13 @@ class Utils {
         const fileName = path.basename(url.split("?")[0]) || `update-${Date.now()}`;
         const savePath = path.join(tempDir, fileName);
 
-        this.downloadAbortController = new AbortController();
+        const abortController = new AbortController();
+        this.downloadAbortController = abortController;
 
         try {
             const response = await axios.get(url, {
                 responseType: "stream",
-                signal: this.downloadAbortController.signal,
+                signal: abortController.signal,
                 headers: {
                     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
                 },
@@ -96,11 +103,14 @@ class Utils {
             this.downloadedUpdatePath = savePath;
             this.sendUpdateEvent("@shared/utils/update-downloaded", savePath);
         } catch (error: any) {
-            if (error.name !== "CanceledError") {
+            // Only report error if this is still the active download (not aborted by a retry)
+            if (this.downloadAbortController === abortController && error.name !== "CanceledError") {
                 this.sendUpdateEvent("@shared/utils/update-download-error", error.message || "下载失败");
             }
         } finally {
-            this.downloadAbortController = null;
+            if (this.downloadAbortController === abortController) {
+                this.downloadAbortController = null;
+            }
         }
     }
 

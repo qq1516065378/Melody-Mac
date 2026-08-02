@@ -1,12 +1,12 @@
 {
-  "version": "1.0.2",
+  "version": "1.0.3",
   "changeLog": [
+    "修复托盘图标退出功能无效的问题",
+    "修复更新下载重试无响应的问题",
     "适配 Windows 平台",
-    "优化音源插件排序",
-    "新增 Windows 自动更新支持"
+    "优化音源插件排序"
   ],
   "download": [
-    "https://github.com/qq1516065378/Melody-Mac/releases/download/v1.0.2/Melody-1.0.2.dmg",
-    "https://github.com/qq1516065378/Melody-Mac/releases/download/v1.0.2/Melody-win32-x64-1.0.2.zip"
+    "https://github.com/qq1516065378/Melody-Mac/releases/download/v1.0.3/Melody-win32-x64-1.0.3.zip"
   ]
 }
