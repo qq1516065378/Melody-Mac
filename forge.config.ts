@@ -1,8 +1,7 @@
 import type { ForgeConfig } from "@electron-forge/shared-types";
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerDeb } from "@electron-forge/maker-deb";
-import { MakerDMG } from "@electron-forge/maker-dmg";
-import { MakerSquirrel } from "@electron-forge/maker-squirrel";
+
 import { WebpackPlugin } from "@electron-forge/plugin-webpack";
 
 import { mainConfig } from "./config/webpack.main.config";
@@ -22,19 +21,11 @@ const config: ForgeConfig = {
       },
     ],
   },
-  rebuildConfig: {},
+  rebuildConfig: {
+    onlyModules: [],
+  },
   makers: [
-    new MakerSquirrel({
-      name: "Melody",
-      setupExe: "Melody-Setup-${version}.exe",
-    }, ["win32"]),
-    new MakerZIP({}, ["darwin"]),
-    new MakerDMG(
-      {
-        format: "ULFO",
-      },
-      ["darwin"]
-    ),
+    new MakerZIP({}, ["win32"]),
     new MakerDeb({
       options: {
         name: "melody",

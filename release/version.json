@@ -1,12 +1,12 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "changeLog": [
-    "首个正式版本发布",
-    "支持音源插件系统",
-    "新增自动更新功能"
+    "适配 Windows 平台",
+    "优化音源插件排序",
+    "新增 Windows 自动更新支持"
   ],
   "download": [
-    "https://github.com/qq1516065378/Melody-Mac/releases/download/v1.0.1/Melody-1.0.1.dmg",
-    "https://github.com/qq1516065378/Melody-Mac/releases/download/v1.0.1/Melody-Setup-1.0.1.exe"
+    "https://github.com/qq1516065378/Melody-Mac/releases/download/v1.0.2/Melody-1.0.2.dmg",
+    "https://github.com/qq1516065378/Melody-Mac/releases/download/v1.0.2/Melody-win32-x64-1.0.2.zip"
   ]
 }
