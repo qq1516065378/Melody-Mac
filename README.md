@@ -1,4 +1,4 @@
-# MusicFree 桌面版
+# Melody 桌面版，基于Musicfree开发优化UI功能
 ![GitHub Repo stars](https://img.shields.io/github/stars/maotoumao/MusicFreeDesktop) 
 ![GitHub forks](https://img.shields.io/github/forks/maotoumao/MusicFreeDesktop)
 ![star](https://gitcode.com/maotoumao/MusicFreeDesktop/star/badge.svg)
