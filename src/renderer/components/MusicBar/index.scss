@@ -1,0 +1,365 @@
+.music-bar-container {
+  --music-bar-accent: #3b91ed;
+  --primaryColor: var(--music-bar-accent);
+  width: calc(100vw - var(--sideBarOffset, 232px) - 12px);
+  height: 76px;
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: minmax(210px, 270px) minmax(280px, 1fr) minmax(230px, 270px);
+  align-items: center;
+  position: relative;
+  z-index: 4000;
+  box-sizing: border-box;
+  margin: 6px 12px 0 var(--sideBarOffset, 232px);
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  border-radius: 17px 17px 0 0;
+  background: rgba(255, 255, 255, 0.985);
+  box-shadow: 0 -6px 22px rgba(24, 30, 42, 0.045);
+  overflow: visible;
+  user-select: none;
+  transition: width 180ms ease, margin-left 180ms ease;
+
+  &[data-playback-color="neutral"] { --music-bar-accent: #8d9098; }
+  &[data-playback-color="coral"] { --music-bar-accent: #f35c68; }
+  &[data-playback-color="orange"] { --music-bar-accent: #fa8758; }
+  &[data-playback-color="amber"] { --music-bar-accent: #e9a635; }
+  &[data-playback-color="lime"] { --music-bar-accent: #91c646; }
+  &[data-playback-color="green"] { --music-bar-accent: #45bd6e; }
+  &[data-playback-color="cyan"] { --music-bar-accent: #2eb0aa; }
+  &[data-playback-color="blue"] { --music-bar-accent: #3b91ed; }
+  &[data-playback-color="indigo"] { --music-bar-accent: #6f78ed; }
+  &[data-playback-color="violet"] { --music-bar-accent: #925be3; }
+  &[data-playback-color="pink"] { --music-bar-accent: #ed57ad; }
+  &[data-playback-color="graphite"] { --music-bar-accent: #666b74; }
+
+  & .music-info-outer-container {
+    grid-column: 1;
+  }
+
+  & .music-bar-center {
+    grid-column: 2;
+    min-width: 0;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  & .music-controller {
+    height: 100%;
+    margin: 0;
+    padding: 0 0 16px;
+  }
+
+  & .play-or-pause {
+    width: 34px;
+    height: 26px;
+    margin: 0 12px;
+    border-radius: 13px;
+    color: white;
+    background: var(--music-bar-accent);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--music-bar-accent) 20%, transparent);
+
+    & svg {
+      width: 15px;
+      height: 15px;
+    }
+  }
+
+  & .skip {
+    width: 34px;
+    height: 34px;
+    margin: 0;
+
+    & svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  & .music-bar--slider-container {
+    width: min(100%, 520px);
+    height: 16px;
+    bottom: 7px;
+    gap: 9px;
+    --slider-height: 3px;
+
+    & .active-bar {
+      background-color: var(--music-bar-accent);
+    }
+  }
+
+  & .music-extra {
+    grid-column: 3;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    gap: 7px;
+    justify-content: flex-end;
+
+    & .extra-btn--theme {
+      display: none;
+    }
+
+    & .extra-btn {
+      width: 27px;
+      height: 27px;
+      margin: 0;
+      flex: 0 0 auto;
+
+      & svg {
+        width: 19px;
+        height: 19px;
+      }
+    }
+
+    & .extra-btn--quality {
+      width: 24px;
+      height: 18px;
+      color: currentColor;
+      border: 1.4px solid currentColor;
+      border-radius: 4px;
+
+      & svg {
+        width: 24px;
+        height: 15px;
+      }
+
+      & .quality-label {
+        display: block;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+        font-size: 9px;
+        line-height: 1;
+        font-weight: 520;
+        letter-spacing: -0.2px;
+      }
+    }
+
+    & .extra-btn--speed {
+      width: 31px;
+
+      & .bar-speed-label {
+        position: absolute;
+        top: 2px;
+        right: 0;
+        color: currentColor;
+        font-size: 6px;
+        line-height: 1;
+        font-weight: 600;
+        letter-spacing: -0.3px;
+      }
+    }
+
+    & .bar-lyric-label {
+      width: 19px;
+      height: 19px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.4px solid currentColor;
+      border-radius: 4px;
+      font-family: "PingFang SC", sans-serif;
+      font-size: 11px;
+      line-height: 1;
+      font-weight: 500;
+    }
+
+  }
+
+  &[data-detail-shown='true'] {
+    --music-bar-accent: #3b91ed;
+    width: 100vw;
+    height: var(--appMusicBarHeight, 62px);
+    grid-template-columns: minmax(280px, 1fr) minmax(390px, 1fr) minmax(260px, 1fr);
+    margin: 0;
+    padding: 0 22px 0 0;
+    border: 0;
+    border-radius: 0 0 20px 20px;
+    background: #f9f9fb;
+    box-shadow: none;
+
+    &[data-playback-color="neutral"] { --music-bar-accent: #8d9098; }
+    &[data-playback-color="coral"] { --music-bar-accent: #f35c68; }
+    &[data-playback-color="orange"] { --music-bar-accent: #fa8758; }
+    &[data-playback-color="amber"] { --music-bar-accent: #e9a635; }
+    &[data-playback-color="lime"] { --music-bar-accent: #91c646; }
+    &[data-playback-color="green"] { --music-bar-accent: #45bd6e; }
+    &[data-playback-color="cyan"] { --music-bar-accent: #2eb0aa; }
+    &[data-playback-color="blue"] { --music-bar-accent: #3b91ed; }
+    &[data-playback-color="indigo"] { --music-bar-accent: #6f78ed; }
+    &[data-playback-color="violet"] { --music-bar-accent: #925be3; }
+    &[data-playback-color="pink"] { --music-bar-accent: #ed57ad; }
+    &[data-playback-color="graphite"] { --music-bar-accent: #666b74; }
+
+    & .music-bar-center {
+      transform: translateX(9px);
+    }
+
+    & .music-controller {
+      height: 38px;
+      padding: 6px 0 0;
+    }
+
+    & .controller-btn,
+    & .extra-btn {
+      color: rgba(28, 30, 34, 0.66);
+    }
+
+    & .play-or-pause {
+      width: 34px;
+      height: 26px;
+      margin: 0 12px;
+      border-radius: 13px;
+      color: white;
+      background: var(--music-bar-accent);
+      box-shadow: 0 2px 6px rgba(59, 145, 237, 0.1);
+
+      & svg {
+        width: 15px;
+        height: 15px;
+      }
+    }
+
+    & .skip {
+      width: 34px;
+      height: 34px;
+      margin: 0;
+      color: rgba(28, 30, 34, 0.84);
+
+      & svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    & .music-bar--slider-container {
+      width: min(100%, 350px);
+      height: 14px;
+      bottom: 8px;
+      gap: 8px;
+      --slider-height: 2px;
+
+      & .slider-time {
+        width: 38px;
+        font-size: 0.76rem;
+        color: rgba(68, 71, 78, 0.62);
+      }
+
+      & .bar {
+        background-color: #dddadd;
+      }
+
+      & .active-bar {
+        background-color: var(--music-bar-accent);
+      }
+    }
+
+    & .music-extra {
+      gap: 9px;
+
+      & > .extra-btn:not(.extra-btn--repeat):not(.extra-btn--volume) {
+        transform: translateX(-8px);
+      }
+
+      & .extra-btn {
+        width: 22px;
+        height: 22px;
+        border-radius: 7px;
+
+        & svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
+
+      & .extra-btn--theme {
+        display: flex;
+        width: 25px;
+
+        & svg {
+          width: 23px;
+          height: 18px;
+        }
+      }
+
+      & .extra-btn--speed {
+        width: 30px;
+
+        & svg {
+          width: 19px;
+          height: 19px;
+        }
+
+        & .bar-speed-label {
+          position: absolute;
+          top: 1px;
+          right: 0;
+          color: currentColor;
+          font-size: 5px;
+          line-height: 1;
+          font-weight: 600;
+          letter-spacing: -0.3px;
+          transform: scale(0.9);
+          transform-origin: right top;
+        }
+      }
+
+      & .extra-btn--quality {
+        width: 22px;
+        height: 16px;
+        border: 1.4px solid currentColor;
+        border-radius: 3px;
+
+        & .quality-label {
+          display: block;
+          font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+          font-size: 9px;
+          line-height: 1;
+          font-weight: 520;
+          letter-spacing: -0.2px;
+        }
+      }
+
+      & .extra-btn--lyric svg,
+      & .extra-btn--playlist svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      & .bar-lyric-label {
+        width: 16px;
+        height: 16px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1.35px solid currentColor;
+        border-radius: 3px;
+        font-family: "PingFang SC", sans-serif;
+        font-size: 10px;
+        line-height: 1;
+        font-weight: 500;
+      }
+    }
+  }
+
+  @media (max-width: 980px) {
+    &:not([data-detail-shown='true']) {
+      grid-template-columns: minmax(205px, 235px) minmax(270px, 1fr) minmax(190px, 215px);
+    }
+
+    &[data-detail-shown='true'] {
+      grid-template-columns: minmax(230px, 0.9fr) minmax(350px, 1.2fr) minmax(220px, 0.9fr);
+      padding-right: 14px;
+
+      & .music-extra {
+        gap: 6px;
+      }
+
+      & .music-bar--slider-container {
+        width: min(100%, 310px);
+      }
+    }
+  }
+}

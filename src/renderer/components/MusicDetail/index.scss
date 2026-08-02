@@ -1,0 +1,677 @@
+.music-detail--container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3000;
+  box-sizing: border-box;
+  padding-bottom: var(--appMusicBarHeight);
+  display: flex;
+  flex-direction: column;
+  -webkit-app-region: no-drag;
+
+  & .music-detail-background {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: absolute;
+    filter: blur(50px);
+    opacity: 0.5;
+    mask-image: linear-gradient(to bottom, #fff, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, #fff, transparent);
+    z-index: -1;
+    transition: background-image ease 300ms;
+  }
+
+  & .hide-music-detail {
+    position: fixed;
+    right: 36px;
+    top: 36px;
+    $size: 28px;
+    width: $size;
+    height: $size;
+    & svg {
+      width: $size;
+      height: $size;
+    }
+  }
+
+  & .music-title {
+    height: 4.8rem;
+    line-height: 4.8rem;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 500;
+    margin-top: 1.5rem;
+    width: 80vw;
+    margin-left: 10vw;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  & .music-info {
+    display: flex;
+    width: 70vw;
+    margin-left: 15vw;
+    font-size: 1.2rem;
+    justify-content: center;
+
+    & span {
+      opacity: 0.8;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      margin-right: 1rem;
+      font-weight: 300;
+    }
+  }
+
+  & .music-body {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4rem 0;
+    height: 0;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    column-gap: 54px;
+
+    & .music-album-options {
+      $size: 35vmin;
+      width: $size;
+      height: $size;
+      object-fit: cover;
+      -webkit-user-drag: none;
+      & .music-album {
+        width: $size;
+        height: $size;
+        border-radius: 8px;
+        object-fit: cover;
+      }
+
+      & .music-options {
+        margin-top: 18px;
+        height: 64px;
+        width: 100%;
+        display: flex;
+        gap: 12px;
+      }
+    }
+  }
+}
+
+// Modern immersive layout. These selectors intentionally live after the
+// legacy rules so theme packs can continue targeting the existing class names.
+.music-detail--container {
+  padding-bottom: calc(var(--appMusicBarHeight) + 20px);
+
+  & .music-detail-background {
+    background-size: 128% 128%;
+    background-position: center;
+    filter: blur(120px) saturate(0.52) brightness(1.12);
+    opacity: 0.055;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  & .music-detail-content {
+    width: min(1280px, calc(100% - 88px));
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 16px 0 28px;
+    height: 0;
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(340px, 1fr) minmax(380px, 1fr);
+    gap: clamp(52px, 8vw, 126px);
+    align-items: center;
+  }
+
+  & .music-visual-column {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  & .music-vinyl {
+    width: min(48vmin, 500px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    position: relative;
+    display: grid;
+    place-items: center;
+    background:
+      repeating-radial-gradient(circle at center, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px 5px),
+      radial-gradient(circle at center, #20242b 0 16%, #0f1217 16.4% 58%, #242931 59% 60%, #0e1116 61% 100%);
+    box-shadow: 0 30px 60px rgba(18, 23, 33, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.28) inset;
+    animation: vinyl-spin 18s linear infinite;
+    animation-play-state: paused;
+
+    &[data-playing="true"] {
+      animation-play-state: running;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #eef0f4;
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.28);
+    }
+
+    & .vinyl-grooves {
+      position: absolute;
+      inset: 5%;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 20px rgba(255, 255, 255, 0.018), 0 0 0 42px rgba(255, 255, 255, 0.018);
+    }
+
+    & .music-album {
+      width: 54%;
+      height: 54%;
+      border-radius: 50%;
+      object-fit: cover;
+      -webkit-user-drag: none;
+    }
+  }
+
+  & .music-title {
+    width: auto;
+    height: auto;
+    line-height: 1.3;
+    margin: 30px 0 0;
+    max-width: 100%;
+    text-align: center;
+    font-size: clamp(1.55rem, 2.6vw, 2.25rem);
+    font-weight: 650;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  & .music-info {
+    width: auto;
+    margin: 8px 0 0;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--secondaryTextColor);
+    font-size: 1rem;
+
+    & span {
+      margin: 0;
+      font-weight: 400;
+      opacity: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+
+  & .music-lyric-column {
+    height: min(64vh, 650px);
+    min-height: 320px;
+    min-width: 0;
+  }
+}
+
+@keyframes vinyl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Album-led playback layout. Colour comes from the active artwork rather than
+// from a fixed player theme, while the surrounding UI stays quiet and warm.
+.music-detail--container {
+  padding-bottom: 64px;
+  --playback-accent: #3b91ed;
+  --playback-wash: #edf4fd;
+  background:
+    radial-gradient(circle at 27% 43%, color-mix(in srgb, var(--playback-wash) 60%, white), transparent 42%),
+    linear-gradient(135deg, color-mix(in srgb, var(--playback-wash) 25%, #f8f7f5) 0%, #f5f4f3 54%, color-mix(in srgb, var(--playback-wash) 18%, #f8f7f6) 100%);
+
+  &[data-playback-color="neutral"] { --playback-accent: #8d9098; --playback-wash: #eef0f3; }
+  &[data-playback-color="coral"] { --playback-accent: #f35c68; --playback-wash: #fdebed; }
+  &[data-playback-color="orange"] { --playback-accent: #fa8758; --playback-wash: #fff0e8; }
+  &[data-playback-color="amber"] { --playback-accent: #e9a635; --playback-wash: #fff5dd; }
+  &[data-playback-color="lime"] { --playback-accent: #91c646; --playback-wash: #f1f8e5; }
+  &[data-playback-color="green"] { --playback-accent: #45bd6e; --playback-wash: #e8f7ed; }
+  &[data-playback-color="cyan"] { --playback-accent: #2eb0aa; --playback-wash: #e6f7f5; }
+  &[data-playback-color="blue"] { --playback-accent: #3b91ed; --playback-wash: #e9f2fc; }
+  &[data-playback-color="indigo"] { --playback-accent: #6f78ed; --playback-wash: #eceefe; }
+  &[data-playback-color="violet"] { --playback-accent: #925be3; --playback-wash: #f1eafd; }
+  &[data-playback-color="pink"] { --playback-accent: #ed57ad; --playback-wash: #fce9f4; }
+  &[data-playback-color="graphite"] { --playback-accent: #666b74; --playback-wash: #e9eaec; }
+
+  & .music-detail-content {
+    width: min(1240px, calc(100% - 88px));
+    padding: 0 0 10px;
+    grid-template-columns: minmax(350px, 0.98fr) minmax(390px, 1.02fr);
+    gap: clamp(62px, 7.4vw, 116px);
+  }
+
+  & .music-visual-column {
+    transform: translateX(42px);
+  }
+
+  & .music-turntable {
+    // All artwork sources share this single geometry token. The record must
+    // never be sized by the intrinsic dimensions of the newly loaded cover.
+    --vinyl-size: min(43vmin, 430px);
+    width: min(53vmin, 530px);
+    height: min(46vmin, 460px);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    & .vinyl-glow {
+      position: absolute;
+      left: -2%;
+      width: min(45vmin, 450px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      filter: blur(38px) saturate(0.82);
+      opacity: 0.13;
+      pointer-events: none;
+    }
+  }
+
+  & .music-vinyl {
+    width: var(--vinyl-size);
+    height: var(--vinyl-size);
+    min-width: var(--vinyl-size);
+    min-height: var(--vinyl-size);
+    max-width: var(--vinyl-size);
+    max-height: var(--vinyl-size);
+    flex: 0 0 var(--vinyl-size);
+    box-sizing: border-box;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    --vinyl-deep: color-mix(in srgb, var(--vinyl-color, #7e8b9e) 74%, #18263b);
+    background-color: var(--vinyl-color, #7e8b9e);
+    background-image:
+      radial-gradient(circle at 35% 28%, rgba(255, 255, 255, .42), transparent 27%),
+      linear-gradient(145deg, rgba(255, 255, 255, .18), transparent 42% 68%, rgba(35, 45, 65, .08));
+    box-shadow:
+      0 22px 48px rgba(35, 43, 58, .12),
+      0 0 0 1px rgba(255, 255, 255, .28) inset;
+
+    & .vinyl-color {
+      position: absolute;
+      inset: -11%;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      filter: blur(42px) saturate(1.24) brightness(1.12);
+      opacity: .2;
+      mix-blend-mode: luminosity;
+      z-index: 3;
+
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      z-index: 4;
+      background: linear-gradient(132deg, rgba(255, 255, 255, 0.24), transparent 38% 69%, rgba(255, 255, 255, 0.1));
+      pointer-events: none;
+    }
+
+    &::after {
+      z-index: 7;
+      width: 7px;
+      height: 7px;
+      background: rgba(255, 255, 255, 0.94);
+    }
+
+    & .vinyl-material {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      border-radius: 50%;
+      background: url("../../../assets/imgs/vinyl-material-texture-v2.png") center / 128% 128% no-repeat;
+      mix-blend-mode: overlay;
+      filter: contrast(1.58) brightness(.86);
+      opacity: .54;
+      pointer-events: none;
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 1.5%;
+        border-radius: inherit;
+        background:
+          linear-gradient(128deg, rgba(255, 255, 255, .16), transparent 29% 73%, rgba(255, 255, 255, .06)),
+          repeating-radial-gradient(circle at center,
+            transparent 0 7px,
+            color-mix(in srgb, var(--vinyl-deep) 24%, transparent) 7.5px 8.25px,
+            transparent 8.75px 13px);
+        opacity: .72;
+      }
+    }
+
+    & .vinyl-grooves {
+      display: block;
+      inset: 1.5%;
+      z-index: 5;
+      border: 1px solid rgba(255, 255, 255, .15);
+      background:
+        radial-gradient(circle at 27% 21%, rgba(255, 255, 255, .26), transparent 18%),
+        linear-gradient(18deg,
+          transparent 0 20%,
+          color-mix(in srgb, var(--vinyl-deep) 30%, transparent) 21% 22%,
+          transparent 24% 59%,
+          color-mix(in srgb, var(--vinyl-deep) 22%, transparent) 60% 61%,
+          transparent 63%),
+        repeating-conic-gradient(from 12deg,
+          color-mix(in srgb, var(--vinyl-deep) 14%, transparent) 0deg .65deg,
+          transparent .8deg 5deg),
+        repeating-radial-gradient(circle at center,
+          transparent 0 8px,
+          color-mix(in srgb, var(--vinyl-deep) 34%, transparent) 8px 9px,
+          transparent 9px 14px);
+      box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--vinyl-deep) 22%, transparent) inset,
+        0 0 36px rgba(255, 255, 255, .13) inset;
+      opacity: .34;
+      pointer-events: none;
+    }
+
+    & .music-album {
+      position: relative;
+      z-index: 6;
+      width: 55%;
+      height: 55%;
+      min-width: 55%;
+      min-height: 55%;
+      max-width: 55%;
+      max-height: 55%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      object-position: center;
+      box-sizing: border-box;
+      box-shadow:
+        0 9px 28px rgba(36, 33, 29, 0.16),
+        0 0 22px rgba(255, 255, 255, 0.48);
+    }
+  }
+
+  & .vinyl-tonearm {
+    position: absolute;
+    z-index: 8;
+    width: min(22vmin, 220px);
+    height: min(40vmin, 400px);
+    right: -1.5%;
+    top: 0;
+    overflow: visible;
+    pointer-events: none;
+
+    & .tonearm-shadow {
+      fill: rgba(255, 255, 255, 0.35);
+      filter: drop-shadow(0 8px 11px rgba(53, 49, 44, 0.14));
+    }
+
+    & .tonearm-base {
+      fill: url(#tonearm-metal);
+      stroke: rgba(255, 255, 255, 0.9);
+      stroke-width: 2;
+    }
+
+    & .tonearm-rod-shadow,
+    & .tonearm-rod {
+      fill: none;
+      stroke-linecap: round;
+    }
+
+    & .tonearm-rod-shadow {
+      stroke: rgba(43, 46, 52, 0.09);
+      stroke-width: 15;
+      transform: translate(2px, 4px);
+    }
+
+    & .tonearm-rod {
+      stroke: url(#tonearm-metal);
+      stroke-width: 10;
+    }
+
+    & .tonearm-head {
+      fill: url(#tonearm-metal);
+      stroke: rgba(255, 255, 255, 0.92);
+      stroke-width: 2;
+      filter: drop-shadow(2px 5px 6px rgba(53, 49, 44, 0.12));
+    }
+
+    & .tonearm-needle {
+      fill: #d4d8de;
+      stroke: white;
+      stroke-width: 1.5;
+    }
+  }
+
+  & .music-lyric-column {
+    height: min(68vh, 660px);
+    min-height: 360px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  & .music-lyric-header {
+    flex-shrink: 0;
+    padding: 0 18px 16px;
+    transform: translateY(28px);
+
+    & .music-title {
+      width: 100%;
+      margin: 0;
+      text-align: left;
+      font-size: clamp(1.7rem, 2.5vw, 2.35rem);
+    }
+
+    & .music-info {
+      width: 100%;
+      margin: 8px 0 0;
+      justify-content: flex-start;
+    }
+  }
+
+  & .music-lyric-scroll {
+    height: 0;
+    flex: 1;
+    min-height: 0;
+  }
+
+  & .lyric-container .lyric-item[data-highlight="true"] {
+    color: var(--playback-accent) !important;
+  }
+
+  & .music-info .components--tag-container {
+    border-color: var(--playback-accent);
+    color: white;
+
+    &[data-fill="true"] {
+      background-color: var(--playback-accent);
+    }
+  }
+
+  &[data-playback-layout="lyric-left"] {
+    & .music-detail-content {
+      grid-template-columns: minmax(390px, 1.02fr) minmax(350px, .98fr);
+    }
+    & .music-visual-column { grid-column: 2; grid-row: 1; transform: translateX(-20px); }
+    & .music-lyric-column { grid-column: 1; grid-row: 1; }
+  }
+
+  &[data-playback-layout="cover-focus"] {
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 82% 28%, color-mix(in srgb, var(--playback-wash) 72%, white) 0, rgba(255, 255, 255, 0) 34%),
+      #f9f9fb;
+
+    & .music-detail-background {
+      background-size: cover;
+      background-position: 84% 18%;
+      filter: blur(74px) saturate(.92) brightness(1.08);
+      opacity: .075;
+    }
+
+    & .music-detail-content {
+      position: relative;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      display: block;
+      overflow: visible;
+    }
+
+    & .music-visual-column {
+      position: absolute;
+      z-index: 1;
+      top: -165px;
+      right: -190px;
+      width: min(95vmin, 760px);
+      height: min(95vmin, 760px);
+      transform: none;
+      opacity: 1;
+    }
+
+    & .music-turntable {
+      --vinyl-size: clamp(590px, 64vw, 760px);
+      position: fixed;
+      z-index: 1;
+      top: -120px;
+      right: -220px;
+      width: clamp(590px, 64vw, 760px) !important;
+      height: clamp(590px, 64vw, 760px) !important;
+      display: grid;
+      place-items: center;
+      // The clamp above is already the final record diameter. Keep only a
+      // subtle enlargement and positioning offset; the previous 1.4 scale
+      // made the disc roughly forty percent larger than the reference.
+      transform: translate(55px, -105px) scale(1.06);
+      transform-origin: center;
+
+      & .vinyl-glow {
+        left: 2%;
+        width: 96%;
+        filter: blur(34px) saturate(.92);
+        opacity: .12;
+      }
+    }
+
+    & .music-vinyl {
+      width: var(--vinyl-size) !important;
+      height: var(--vinyl-size) !important;
+      min-width: var(--vinyl-size);
+      min-height: var(--vinyl-size);
+      max-width: var(--vinyl-size);
+      max-height: var(--vinyl-size);
+      box-shadow: 0 24px 54px rgba(43, 50, 62, .09);
+
+      & .music-album {
+        width: 68%;
+        height: 68%;
+        min-width: 68%;
+        min-height: 68%;
+        max-width: 68%;
+        max-height: 68%;
+      }
+    }
+
+    & .vinyl-tonearm {
+      display: none;
+    }
+
+    & .music-lyric-column {
+      position: absolute;
+      z-index: 3;
+      top: 9%;
+      bottom: 5%;
+      left: clamp(76px, 10vw, 150px);
+      width: clamp(330px, 40vw, 510px);
+      height: auto;
+      min-height: 0;
+    }
+
+    & .music-lyric-header {
+      padding: 0 12px 20px;
+      transform: none;
+
+      & .music-title {
+        font-size: clamp(1.25rem, 1.8vw, 1.65rem);
+        font-weight: 560;
+      }
+
+      & .music-info {
+        margin-top: 6px;
+        font-size: .9rem;
+      }
+    }
+
+    & .lyric-container {
+      font-size: clamp(1rem, 1.25vw, 1.18rem);
+      mask-image: linear-gradient(to bottom, transparent 0, #000 8%, #000 83%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 8%, #000 83%, transparent 100%);
+    }
+
+    & .lyric-item {
+      padding: .72em 12px;
+      opacity: .7;
+
+      &[data-highlight="true"] {
+        font-size: 1.12em;
+        transform: none;
+      }
+    }
+
+    & .lyric-options-container {
+      left: 12px;
+      right: auto;
+    }
+  }
+
+  &[data-playback-layout="vertical"] {
+    & .music-detail-content {
+      width: min(900px, calc(100% - 80px));
+      padding-top: 4px;
+      grid-template-columns: 1fr;
+      grid-template-rows: minmax(210px, .9fr) minmax(230px, 1.1fr);
+      gap: 4px;
+    }
+    & .music-visual-column { grid-row: 1; transform: none; }
+    & .music-turntable {
+      --vinyl-size: min(28vmin, 280px);
+      width: min(34vmin, 340px);
+      height: min(29vmin, 290px);
+    }
+    & .music-vinyl {
+      width: var(--vinyl-size);
+      height: var(--vinyl-size);
+    }
+    & .vinyl-tonearm { width: min(14vmin, 140px); height: min(26vmin, 260px); }
+    & .music-lyric-column { grid-row: 2; height: 100%; min-height: 220px; }
+    & .music-lyric-header { transform: none; text-align: center; padding-bottom: 4px; }
+    & .music-title { text-align: center; font-size: 1.35rem; }
+    & .music-info { justify-content: center; }
+    & .lyric-item { text-align: center; padding-top: .55em; padding-bottom: .55em; }
+    & .lyric-item[data-highlight="true"] { transform: scale(1.03); }
+  }
+}

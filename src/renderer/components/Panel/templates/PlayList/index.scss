@@ -1,0 +1,131 @@
+.playlist--header {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  min-height: 70px;
+
+  & .playlist--title {
+    font-size: 1.28rem;
+    font-weight: 660;
+  }
+
+  & [data-type="normalButton"] {
+    color: var(--secondaryTextColor);
+    border: 0;
+    background: transparent;
+  }
+}
+
+.playlist--music-list-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 10px 12px;
+  box-sizing: border-box;
+}
+
+.playlist--music-list-scroll {
+  position: relative;
+  width: 100%;
+  outline: none;
+}
+
+.playlist--divider {
+  width: calc(100% - 40px);
+  height: 1px;
+  background-color: var(--dividerColor);
+  margin: 0 20px 10px;
+}
+
+.play-list--music-item-container {
+  width: 100%;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  position: relative;
+
+  &[data-active="true"] {
+    background: color-mix(in srgb, var(--primaryColor) 10%, white);
+  }
+
+  & .playlist--artwork {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--placeholderColor);
+  }
+
+  & .playlist--meta {
+    min-width: 0;
+    flex: 1;
+    margin-left: 11px;
+  }
+
+  & .playlist--title {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: .98rem;
+    font-weight: 520;
+
+    & > span:last-child {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+
+  & .playlist--subtitle {
+    min-width: 0;
+    margin-top: 5px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--secondaryTextColor);
+    font-size: .82rem;
+  }
+
+  & .playlist--trailing {
+    width: 42px;
+    flex: 0 0 42px;
+    margin-left: 8px;
+    text-align: right;
+    color: var(--secondaryTextColor);
+    font-size: .78rem;
+  }
+
+  & .playlist--remove {
+    position: absolute;
+    right: 6px;
+    top: 17px;
+    height: 28px;
+    width: 28px;
+    border-radius: 8px;
+    opacity: 0;
+    display: grid;
+    place-items: center;
+
+    &:hover { background: rgba(20, 26, 36, .07); }
+  }
+
+  &:nth-child(even) {
+    background-color: transparent;
+  }
+  &:hover {
+    background: rgba(20, 26, 36, .045);
+
+    & .playlist--remove { opacity: .65; }
+    & .playlist--duration { opacity: 0; }
+  }
+}

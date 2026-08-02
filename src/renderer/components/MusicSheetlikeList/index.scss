@@ -1,0 +1,10 @@
+.music-sheet-like-list--container {
+    width: 100%;
+
+    & .music-sheet-like-list--body {
+        display: grid;
+        width: 100%;
+        grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+        gap: 24px 18px;
+    }
+}

@@ -1,0 +1,10 @@
+.search-result--album-result-container {
+    width: 100%;
+
+    & .result-body {
+        display: grid;
+        width: 100%;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 22px 18px;
+    }
+}

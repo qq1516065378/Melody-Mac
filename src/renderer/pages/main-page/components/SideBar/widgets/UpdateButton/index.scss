@@ -1,0 +1,138 @@
+.update-button-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    .update-button {
+        height: 22px;
+        min-width: 36px;
+        padding: 0 6px;
+        border: 1px solid currentColor;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--headerTextColor);
+        opacity: 0.56;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        font-size: 10px;
+        font-weight: 500;
+        line-height: 1;
+        white-space: nowrap;
+        transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease;
+
+        &:hover {
+            opacity: 1;
+            background: rgba(20, 26, 36, 0.06);
+        }
+
+        &:active {
+            opacity: 1;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.4;
+        }
+
+        .update-progress-bar {
+            position: absolute;
+            bottom: -1.5px;
+            left: -1.5px;
+            right: -1.5px;
+            height: 2px;
+            border-bottom-left-radius: 7px;
+            border-bottom-right-radius: 7px;
+            overflow: hidden;
+            background: rgba(20, 26, 36, 0.08);
+
+            .update-progress-fill {
+                height: 100%;
+                background: var(--headerTextColor);
+                opacity: 0.7;
+                transition: width 0.3s ease;
+            }
+        }
+    }
+}
+
+.update-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    min-width: 240px;
+    max-width: 320px;
+    background: var(--backdropColor, rgba(255, 255, 255, 0.98));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 12px;
+    padding: 12px 14px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    z-index: 3000;
+    animation: tooltip-fade-in 0.15s ease;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+
+    .update-tooltip-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 8px;
+        color: var(--textColor, #333);
+
+        .update-tooltip-version {
+            color: var(--textColorSecondary, #666);
+            font-weight: 500;
+            font-size: 12px;
+        }
+    }
+
+    .update-tooltip-changelog {
+        font-size: 12px;
+        line-height: 1.6;
+        color: var(--textColorSecondary, #666);
+        margin-bottom: 10px;
+        max-height: 120px;
+        overflow-y: auto;
+
+        .update-tooltip-changelog-item {
+            margin-bottom: 4px;
+        }
+    }
+
+    .update-tooltip-footer {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 8px;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+        .update-tooltip-skip {
+            font-size: 11px;
+            color: var(--textColorSecondary, #999);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+
+            &:hover {
+                background: rgba(0, 0, 0, 0.05);
+                color: var(--textColor, #333);
+            }
+        }
+    }
+}
+
+@keyframes tooltip-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

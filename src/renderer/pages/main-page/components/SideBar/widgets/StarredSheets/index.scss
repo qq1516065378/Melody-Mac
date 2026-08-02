@@ -1,0 +1,41 @@
+.side-bar-container--starred-sheets {
+
+  & .title {
+    height: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 12px;
+    padding-right: 8px;
+    opacity: 0.58;
+    font-size: 0.9rem;
+    font-weight: 600;
+    user-select: none;
+
+    $tag-size: 4px;
+    & .my-sheets {
+      display: flex;
+      align-items: center;
+      &::after {
+        content: "";
+        width: 0;
+        height: 0;
+        margin-left: 0.5rem;
+        border: $tag-size solid  transparent;
+        border-left-color: currentColor;
+        transform-origin: left center;
+        transition: transform linear 100ms;
+      }
+    }
+
+    &[data-headlessui-state="open"] {
+      & .my-sheets {
+        &::after {
+          transform: rotate(90deg);
+        }
+      }
+    }
+
+
+  }
+}

@@ -1,0 +1,30 @@
+.search-view--plugins {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  font-size: .94rem;
+  gap: 8px;
+  border: 1px solid rgba(20, 26, 36, .045);
+  border-radius: 14px;
+  background: rgba(246, 247, 250, .76);
+
+  & .plugin-item {
+    box-sizing: border-box;
+    height: 31px;
+    border-radius: 9px;
+    padding: 0 12px;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &[data-selected="true"] {
+      background-color: var(--primaryColor);
+      color: white;
+      box-shadow: 0 5px 14px color-mix(in srgb, var(--primaryColor) 22%, transparent);
+    }
+
+    &:not([data-selected="true"]):hover { background: white; border-color: var(--dividerColor); }
+  }
+}

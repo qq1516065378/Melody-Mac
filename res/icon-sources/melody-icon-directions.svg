@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1260" height="470" viewBox="0 0 1260 470">
+  <rect width="1260" height="470" rx="32" fill="#EEF1F4"/>
+
+  <!-- A: a short musical phrase represented by a flowing path and three beats -->
+  <g transform="translate(40 34)">
+    <rect width="360" height="360" rx="88" fill="#20D89A"/>
+    <path d="M82 230C124 230 132 132 180 132C222 132 226 208 278 208" fill="none" stroke="#FFF" stroke-width="17" stroke-linecap="round"/>
+    <circle cx="82" cy="230" r="26" fill="#FFF"/>
+    <circle cx="180" cy="132" r="26" fill="#FFF"/>
+    <circle cx="278" cy="208" r="26" fill="#FFF"/>
+    <text x="180" y="410" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="22" font-weight="600" fill="#20252C">A · 旋律轨迹</text>
+  </g>
+
+  <!-- B: two connected notes condensed into one proprietary ribbon -->
+  <g transform="translate(450 34)">
+    <rect width="360" height="360" rx="88" fill="#FAF9F5"/>
+    <path d="M112 235V123C112 107 124 96 140 92L257 66V190" fill="none" stroke="#171B20" stroke-width="21" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M101 219C72 225 55 248 61 271C67 295 94 307 122 300C150 293 168 270 162 247C156 224 130 212 101 219Z" fill="#20D89A"/>
+    <path d="M246 174C217 181 200 204 206 227C212 251 239 263 267 256C295 249 313 226 307 203C301 180 275 168 246 174Z" fill="#20D89A"/>
+    <text x="180" y="410" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="22" font-weight="600" fill="#20252C">B · 双音连带</text>
+  </g>
+
+  <!-- C: sound-groove fingerprint -->
+  <g transform="translate(860 34)">
+    <rect width="360" height="360" rx="88" fill="#171B20"/>
+    <path d="M96 234C96 160 132 112 180 112C228 112 264 160 264 234" fill="none" stroke="#20D89A" stroke-width="18" stroke-linecap="round"/>
+    <path d="M128 234C128 182 150 150 180 150C210 150 232 182 232 234" fill="none" stroke="#20D89A" stroke-width="18" stroke-linecap="round"/>
+    <path d="M160 234C160 202 168 186 180 186C192 186 200 202 200 234" fill="none" stroke="#FFF" stroke-width="18" stroke-linecap="round"/>
+    <circle cx="180" cy="266" r="19" fill="#FFF"/>
+    <text x="180" y="410" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="22" font-weight="600" fill="#20252C">C · 声音指纹</text>
+  </g>
+</svg>

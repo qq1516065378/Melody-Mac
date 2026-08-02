@@ -1,0 +1,103 @@
+// 控制区域
+.music-controller {
+  box-sizing: border-box;
+  margin-left: 10px;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-bottom: 16px;
+
+  & .controller-btn {
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    margin: 0;
+    flex: 0 0 34px;
+}
+
+  & .primary-btn {
+    background-color: var(--primaryColor);
+    color: white;
+    box-shadow: 0 5px 14px rgba(24, 214, 140, 0.22);
+    transition: transform 150ms ease, box-shadow 150ms ease;
+
+    &:hover {
+      transform: scale(1.035);
+      box-shadow: 0 7px 18px rgba(24, 214, 140, 0.26);
+    }
+
+  }
+
+  & .play-or-pause {
+    width: 42px;
+    height: 42px;
+
+    & svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  & .skip {
+    width: 34px;
+    height: 34px;
+
+    & svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    &:hover {
+      background: var(--secondarySurfaceColor);
+    }
+  }
+
+  & .controller-aux-btn {
+    position: relative;
+
+    & svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover { background: var(--secondarySurfaceColor); }
+  }
+
+  & .controller-volume-popover {
+    width: 48px;
+    height: 142px;
+    position: absolute;
+    z-index: 40;
+    bottom: calc(100% + 7px);
+    left: 50%;
+    transform: translateX(-50%);
+    box-sizing: border-box;
+    padding: 13px 0 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, .9);
+    border-radius: 14px;
+    color: var(--secondaryTextColor);
+    background: rgba(255, 255, 255, .98);
+    box-shadow: 0 14px 40px rgba(28, 34, 46, .17);
+    cursor: default;
+
+    & .rc-slider-vertical {
+      height: 94px;
+      & .rc-slider-rail { background: #d8dce3; }
+      & .rc-slider-track { background: var(--primaryColor); }
+      & .rc-slider-handle { border-color: var(--primaryColor); opacity: 1; }
+    }
+
+    & span { font-size: .62rem; }
+  }
+}

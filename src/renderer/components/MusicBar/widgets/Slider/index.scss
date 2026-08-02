@@ -1,0 +1,58 @@
+.music-bar--slider-container {
+  position: absolute;
+  width: min(42vw, 560px);
+  left: 50%;
+  bottom: 7px;
+  height: 16px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  --slider-height: 3px;
+
+  & .slider-time {
+    width: 38px;
+    flex-shrink: 0;
+    color: var(--secondaryTextColor);
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  & .current-time {
+    text-align: right;
+  }
+
+  & .slider-track {
+    height: 12px;
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 999px;
+
+    &:hover,
+    &:active {
+      --slider-height: 5px;
+    }
+  }
+
+  & .bar {
+    width: 100%;
+    height: var(--slider-height);
+    transition: height 80ms linear;
+    background-color: #dfe2e7;
+    border-radius: 999px;
+  }
+
+  & .active-bar {
+    position: absolute;
+    width: 0;
+    left: 0;
+    height: var(--slider-height);
+    background-color: var(--primaryColor);
+    transition: height linear 80ms;
+    border-radius: 999px;
+  }
+}

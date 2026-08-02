@@ -1,0 +1,22 @@
+.page-container {
+  flex: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  padding: 18px 24px 28px;
+  position: relative;
+  min-width: 0;
+  box-sizing: border-box;
+  background: var(--surfaceColor);
+  border-radius: 18px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85) inset;
+}
+
+.page-container-full-width {
+  padding: 0;
+}
+
+.page-container-fw {
+  @extend .page-container;
+  padding: 0;
+}

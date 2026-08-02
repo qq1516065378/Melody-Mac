@@ -1,0 +1,57 @@
+.setting-view--short-cut-container {
+  width: 100%;
+}
+
+.setting-view--short-cut-table-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(130px, 1.1fr) minmax(150px, 1fr) minmax(150px, 1fr);
+  gap: 18px;
+  align-items: center;
+  min-height: 48px;
+  border-bottom: 1px solid color-mix(in srgb, var(--dividerColor) 72%, transparent);
+
+  & .short-cut-cell {
+    width: auto;
+    white-space: nowrap;
+    user-select: none;
+    ime-mode: disabled;
+
+    &:first-child {
+      width: auto;
+    }
+
+    & .short-cut-item--container {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      & [data-disabled=true] {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+
+      &:hover {
+        & .short-cut-item--clear-button {
+          opacity: 1;
+        }
+      }
+
+      & .short-cut-item--clear-button {
+        position: absolute;
+        right: 4px;
+        width: 1.2rem;
+        height: 1.2rem;
+        line-height: 0;
+        transition: opacity ease-in-out 0.2s;
+        opacity: 0;
+
+        & svg {
+          height: 1.2rem;
+          width: 1.2rem;
+        }
+      }
+
+    }
+  }
+}
