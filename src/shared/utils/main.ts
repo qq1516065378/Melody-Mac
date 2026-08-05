@@ -30,24 +30,27 @@ class Utils {
 
     private getDownloadUrlForPlatform(downloadUrls: string[]): string | null {
         const platform = process.platform;
-        // Try to find a matching URL for current platform
+        // 检查是否为Windows平台的安装包（避免darwin误匹配：d-a-r-**w-i-n**）
+        const isWindowsPackage = (url: string) => /(win32|win64|windows|-win\b|\/win\b)/i.test(url);
+
         for (const url of downloadUrls) {
             const lowerUrl = url.toLowerCase();
             if (platform === "darwin") {
-                // Mac: dmg, zip (but not win32 zip), pkg
-                if ((lowerUrl.endsWith(".dmg") || lowerUrl.endsWith(".pkg")) && !lowerUrl.includes("win") && !lowerUrl.includes("win32")) {
-                    return url;
-                }
-                // zip文件需要排除win平台的zip
-                if (lowerUrl.endsWith(".zip") && !lowerUrl.includes("win") && !lowerUrl.includes("win32")) {
+                // Mac: dmg, pkg, zip（排除Windows包）
+                const isMacCompatible = lowerUrl.endsWith(".dmg") || lowerUrl.endsWith(".pkg") || lowerUrl.endsWith(".zip");
+                if (isMacCompatible && !isWindowsPackage(url)) {
                     return url;
                 }
             }
-            if (platform === "win32" && (lowerUrl.endsWith(".exe") || lowerUrl.includes("setup") || (lowerUrl.endsWith(".zip") && (lowerUrl.includes("win") || lowerUrl.includes("win32"))))) {
-                return url;
+            if (platform === "win32") {
+                if (lowerUrl.endsWith(".exe") || lowerUrl.includes("setup") || (lowerUrl.endsWith(".zip") && isWindowsPackage(url))) {
+                    return url;
+                }
             }
-            if (platform === "linux" && (lowerUrl.endsWith(".deb") || lowerUrl.endsWith(".appimage") || lowerUrl.endsWith(".rpm"))) {
-                return url;
+            if (platform === "linux") {
+                if (lowerUrl.endsWith(".deb") || lowerUrl.endsWith(".appimage") || lowerUrl.endsWith(".rpm")) {
+                    return url;
+                }
             }
         }
         // 没有找到匹配当前平台的安装包

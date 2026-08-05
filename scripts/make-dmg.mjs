@@ -25,10 +25,10 @@ const outDir = path.join(projectRoot, "out");
 const appDir = path.join(outDir, `${appName}-${platform}-${arch}`);
 const appPath = path.join(appDir, `${appName}.app`);
 
-// 输出路径（与 forge 其他产物保持一致的位置，方便统一查找）
+// 输出路径（简单文件名，避免平台标识导致的更新检测问题）
 const makeDir = path.join(outDir, "make", "dmg", platform, arch);
 fs.mkdirSync(makeDir, { recursive: true });
-const dmgPath = path.join(makeDir, `${appName}-${platform}-${arch}-${version}.dmg`);
+const dmgPath = path.join(makeDir, `${appName}-${version}.dmg`);
 
 // 非 macOS 直接退出（postmake 钩子在其他平台不会报错）
 if (platform !== "darwin") {
@@ -88,6 +88,17 @@ try {
     } else {
         console.error("[make-dmg] ❌ DMG creation failed (file not found)");
         process.exit(1);
+    }
+
+    // 同时重命名ZIP文件为简单文件名（方便自动更新）
+    const zipMakeDir = path.join(outDir, "make", "zip", platform, arch);
+    const zipSourceName = `${appName}-${platform}-${arch}-${version}.zip`;
+    const zipSourcePath = path.join(zipMakeDir, zipSourceName);
+    const zipTargetPath = path.join(zipMakeDir, `${appName}-${version}.zip`);
+    if (fs.existsSync(zipSourcePath)) {
+        fs.copyFileSync(zipSourcePath, zipTargetPath);
+        const sizeMB = (fs.statSync(zipTargetPath).size / 1024 / 1024).toFixed(1);
+        console.log(`[make-dmg] ✅ ZIP copied: ${zipTargetPath} (${sizeMB} MB)`);
     }
 } catch (e) {
     console.error("[make-dmg] ❌ Failed to create DMG:", e.message);
