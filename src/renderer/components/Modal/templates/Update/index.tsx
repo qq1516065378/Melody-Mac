@@ -42,7 +42,9 @@ export default function Update(props: IUpdateProps) {
 
     const startDownload = () => {
         if (!update?.download?.length) {
-            shellUtil.openExternal(update.download[0]);
+            if (update?.download?.[0]) {
+                shellUtil.openExternal(update.download[0]);
+            }
             return;
         }
 

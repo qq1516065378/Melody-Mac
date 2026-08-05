@@ -1,4 +1,4 @@
-# MusicFree 桌面版
+# Melody 桌面版
 ![GitHub Repo stars](https://img.shields.io/github/stars/maotoumao/MusicFreeDesktop) 
 ![GitHub forks](https://img.shields.io/github/forks/maotoumao/MusicFreeDesktop)
 ![star](https://gitcode.com/maotoumao/MusicFreeDesktop/star/badge.svg)
@@ -12,7 +12,7 @@
 ---
 
 ## 项目使用约定：
-本项目基于 AGPL 3.0 协议开源，使用此项目时请遵守开源协议。  
+本项目基于 AGPL 3.0 协议开源，使用此项目时请遵守开源协议。 基于Musicfree开发优化UI功能 
 除此外，希望你在使用代码时已经了解以下额外说明：
 
 1. 打包、二次分发 **请保留代码出处**：https://github.com/maotoumao/MusicFree
@@ -20,12 +20,7 @@
 3. 如果开源协议变更，将在此 Github 仓库更新，不另行通知。
 ---
 
-## 简介
 
-一个插件化、定制化、无广告的免费音乐播放器。
-> 当前版本支持 Windows 和 macOS 和 Linux
-
-<img src="./src/assets/imgs/wechat_channel1.png" height="144px" title="微信公众号" style="display:inherit;"/>
 
 
 ### 下载地址

@@ -24,13 +24,15 @@ const config: ForgeConfig = {
       },
     ],
   },
-  rebuildConfig: {},
+  rebuildConfig: {
+    onlyModules: [],
+  },
   makers: [
     new MakerSquirrel({
       name: "Melody",
       setupExe: "Melody-Setup-${version}.exe",
     }, ["win32"]),
-    new MakerZIP({}, ["darwin"]),
+    new MakerZIP({}, ["darwin", "win32"]),
     // MakerDMG disabled — use scripts/make-dmg.mjs instead
     // new MakerDMG({ format: "ULFO" }, ["darwin"]),
     new MakerDeb({

@@ -249,7 +249,7 @@ class TrayManager {
         ctxMenu.push({
             label: t("common.exit"),
             click() {
-                app.quit();
+                app.exit(0);
             },
         });
 
