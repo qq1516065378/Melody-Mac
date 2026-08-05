@@ -11,6 +11,7 @@
     "【修复】更新下载重试无响应的问题"
   ],
   "download": [
+    "https://github.com/qq1516065378/Melody-Mac/releases/download/v1.0.4/Melody-darwin-arm64-1.0.4.zip",
     "https://github.com/qq1516065378/Melody-Mac/releases/download/v1.0.4/Melody-darwin-arm64-1.0.4.dmg"
   ]
 }
