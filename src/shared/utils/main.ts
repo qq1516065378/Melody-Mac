@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, shell, net } from "electron";
 import { IWindowManager } from "@/types/main/window-manager";
 import fs from "fs/promises";
 import { createWriteStream } from "fs";
@@ -78,43 +78,82 @@ class Utils {
         this.downloadAbortController = abortController;
 
         try {
-            const response = await axios.get(url, {
-                responseType: "stream",
-                signal: abortController.signal,
-                headers: {
-                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-                },
-            });
-
-            const totalSize = parseInt(response.headers["content-length"] || "0", 10);
-            let downloadedSize = 0;
-            const startTime = Date.now();
-            const writer = createWriteStream(savePath);
-
-            response.data.on("data", (chunk: Buffer) => {
-                downloadedSize += chunk.length;
-                const elapsed = (Date.now() - startTime) / 1000;
-                this.sendUpdateEvent("@shared/utils/update-download-progress", {
-                    percent: totalSize > 0 ? Math.round((downloadedSize / totalSize) * 100) : -1,
-                    transferred: downloadedSize,
-                    total: totalSize,
-                    bytesPerSecond: elapsed > 0 ? downloadedSize / elapsed : 0,
-                } as ICommon.IUpdateDownloadProgress);
-            });
-
-            response.data.pipe(writer);
-
             await new Promise<void>((resolve, reject) => {
-                writer.on("finish", resolve);
-                writer.on("error", reject);
-                response.data.on("error", reject);
+                const request = net.request({
+                    method: "GET",
+                    url: url,
+                    redirect: "follow",
+                });
+                request.setHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36");
+
+                let totalSize = 0;
+                let downloadedSize = 0;
+                const startTime = Date.now();
+                const writer = createWriteStream(savePath);
+                let hasError = false;
+
+                abortController.signal.addEventListener("abort", () => {
+                    request.abort();
+                    writer.close();
+                    reject(new Error("aborted"));
+                });
+
+                request.on("response", (response) => {
+                    if (response.statusCode >= 400) {
+                        hasError = true;
+                        reject(new Error(`HTTP ${response.statusCode}`));
+                        return;
+                    }
+
+                    const contentLength = response.headers["content-length"];
+                    totalSize = parseInt(Array.isArray(contentLength) ? contentLength[0] : (contentLength || "0"), 10);
+
+                    response.on("data", (chunk: Buffer) => {
+                        if (hasError) return;
+                        downloadedSize += chunk.length;
+                        writer.write(chunk);
+                        const elapsed = (Date.now() - startTime) / 1000;
+                        this.sendUpdateEvent("@shared/utils/update-download-progress", {
+                            percent: totalSize > 0 ? Math.round((downloadedSize / totalSize) * 100) : -1,
+                            transferred: downloadedSize,
+                            total: totalSize,
+                            bytesPerSecond: elapsed > 0 ? downloadedSize / elapsed : 0,
+                        } as ICommon.IUpdateDownloadProgress);
+                    });
+
+                    response.on("end", () => {
+                        if (hasError) return;
+                        writer.end(() => {
+                            resolve();
+                        });
+                    });
+
+                    response.on("error", (err: Error) => {
+                        hasError = true;
+                        writer.close();
+                        reject(err);
+                    });
+                });
+
+                request.on("error", (err: Error) => {
+                    hasError = true;
+                    writer.close();
+                    reject(err);
+                });
+
+                writer.on("error", (err: Error) => {
+                    hasError = true;
+                    reject(err);
+                });
+
+                request.end();
             });
 
             this.downloadedUpdatePath = savePath;
             this.sendUpdateEvent("@shared/utils/update-downloaded", savePath);
         } catch (error: any) {
             // Only report error if this is still the active download (not aborted by a retry)
-            if (this.downloadAbortController === abortController && error.name !== "CanceledError") {
+            if (this.downloadAbortController === abortController && error.message !== "aborted") {
                 this.sendUpdateEvent("@shared/utils/update-download-error", error.message || "下载失败");
             }
         } finally {
