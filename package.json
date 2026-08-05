@@ -1,7 +1,7 @@
 {
   "name": "melody-desktop",
   "productName": "Melody",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "一个插件化的音乐播放器",
   "main": ".webpack/main",
   "scripts": {
@@ -9,6 +9,8 @@
     "dev": "electron-forge start --inspect-electron",
     "package": "electron-forge package",
     "make": "electron-forge make",
+    "postmake": "node scripts/make-dmg.mjs",
+    "make:dmg-only": "node scripts/make-dmg.mjs",
     "publish": "electron-forge publish",
     "lint": "eslint ./src --fix",
     "lint-staged": "lint-staged",

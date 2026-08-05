@@ -104,3 +104,9 @@ undefinedelectron-log-preload.js
 # Dev data
 .dev-data/
 test-update/
+
+# Screenshots and demos at root
+/screen_current.png
+/screenshot_before.png
+/screenshot_melody1.png
+video-storyboard/

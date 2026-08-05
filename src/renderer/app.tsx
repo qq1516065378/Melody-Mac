@@ -2,11 +2,19 @@ import AppHeader from "./components/Header";
 
 import "./app.scss";
 import MusicBar from "./components/MusicBar";
-import { Outlet } from "react-router";
-import PanelComponent from "./components/Panel";
+import { Outlet, useLocation } from "react-router";
+import PanelComponent, { hidePanel } from "./components/Panel";
 import MusicDetail from "@renderer/components/MusicDetail";
+import { useEffect } from "react";
 
 export default function App() {
+    const location = useLocation();
+
+    // 路由切换时自动关闭面板
+    useEffect(() => {
+        hidePanel();
+    }, [location.pathname]);
+
     return (
         <div className="app-container">
             <AppHeader></AppHeader>

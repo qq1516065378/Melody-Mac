@@ -5,19 +5,16 @@ import MusicFavorite from "@/renderer/components/MusicFavorite";
 import MusicDetail, { useMusicDetailShown } from "@/renderer/components/MusicDetail";
 import { useTranslation } from "react-i18next";
 import { useCurrentMusic } from "@renderer/core/track-player/hooks";
-import { hidePanel, showPanel } from "@renderer/components/Panel";
-import PluginManager, { useSortedSupportedPlugin } from "@shared/plugin-manager/renderer";
+import { getCurrentPanel, hidePanel, showPanel } from "@renderer/components/Panel";
 import { showMusicContextMenu } from "@/renderer/components/MusicList";
 import MusicDownloaded from "@/renderer/components/MusicDownloaded";
 import { setFallbackAlbum } from "@/renderer/utils/img-on-error";
 import albumImg from "@/assets/imgs/album-cover.jpg";
-import { toast } from "react-toastify";
 import trackPlayer from "@renderer/core/track-player";
 
 export default function MusicInfo() {
     const musicItem = useCurrentMusic();
     const musicDetailShown = useMusicDetailShown();
-    const commentPlugins = useSortedSupportedPlugin("getMusicComments");
 
     const { t } = useTranslation();
 
@@ -30,43 +27,13 @@ export default function MusicInfo() {
         }
     }
 
-    async function openMusicComments() {
+    function openMusicComments() {
         if (!musicItem) return;
-        if (PluginManager.isSupportFeatureMethod(musicItem.platform, "getMusicComments")) {
+        if (getCurrentPanel()?.type === "MusicComment") {
+            hidePanel();
+        } else {
             showPanel("MusicComment", { musicItem, coverHeader: true });
-            return;
         }
-
-        const searchableCommentPlugins = commentPlugins.filter((plugin) =>
-            plugin.supportedMethod.includes("search") &&
-            (!plugin.supportedSearchType || plugin.supportedSearchType.includes("music")),
-        );
-        const query = [musicItem.title, musicItem.artist].filter(Boolean).join(" ");
-
-        for (const plugin of searchableCommentPlugins) {
-            try {
-                const result = await PluginManager.callPluginDelegateMethod(
-                    plugin,
-                    "search",
-                    query,
-                    1,
-                    "music",
-                ) as IPlugin.ISearchResult<"music">;
-                const normalize = (text?: string) => text?.replace(/\s+/g, "").toLocaleLowerCase();
-                const matched = result?.data?.find((item) =>
-                    normalize(item.title) === normalize(musicItem.title) &&
-                    (!musicItem.artist || normalize(item.artist)?.includes(normalize(musicItem.artist))),
-                ) ?? result?.data?.[0];
-                if (matched) {
-                    showPanel("MusicComment", { musicItem: matched, coverHeader: true });
-                    return;
-                }
-            } catch {
-                // Try the next installed source that supports comments.
-            }
-        }
-
-        toast.info("当前已安装音源未找到这首歌的评论数据");
     }
 
     return (

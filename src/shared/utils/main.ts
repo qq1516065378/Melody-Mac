@@ -33,18 +33,25 @@ class Utils {
         // Try to find a matching URL for current platform
         for (const url of downloadUrls) {
             const lowerUrl = url.toLowerCase();
-            if (platform === "darwin" && (lowerUrl.endsWith(".dmg") || lowerUrl.endsWith(".zip"))) {
-                return url;
+            if (platform === "darwin") {
+                // Mac: dmg, zip (but not win32 zip), pkg
+                if ((lowerUrl.endsWith(".dmg") || lowerUrl.endsWith(".pkg")) && !lowerUrl.includes("win") && !lowerUrl.includes("win32")) {
+                    return url;
+                }
+                // zip文件需要排除win平台的zip
+                if (lowerUrl.endsWith(".zip") && !lowerUrl.includes("win") && !lowerUrl.includes("win32")) {
+                    return url;
+                }
             }
-            if (platform === "win32" && (lowerUrl.endsWith(".exe") || lowerUrl.includes("setup"))) {
+            if (platform === "win32" && (lowerUrl.endsWith(".exe") || lowerUrl.includes("setup") || (lowerUrl.endsWith(".zip") && (lowerUrl.includes("win") || lowerUrl.includes("win32"))))) {
                 return url;
             }
             if (platform === "linux" && (lowerUrl.endsWith(".deb") || lowerUrl.endsWith(".appimage") || lowerUrl.endsWith(".rpm"))) {
                 return url;
             }
         }
-        // Fallback: return first URL
-        return downloadUrls[0] || null;
+        // 没有找到匹配当前平台的安装包
+        return null;
     }
 
     private async downloadUpdate(downloadUrls: string[]) {
@@ -154,8 +161,17 @@ class Utils {
                         },
                     })).data;
                     if (compare(rawInfo.version, currentVersion, ">")) {
-                        updateInfo.update = rawInfo;
-                        return updateInfo;
+                        // 检查是否有当前平台的安装包
+                        const downloadUrls: string[] = [];
+                        if (Array.isArray(rawInfo.download)) {
+                            downloadUrls.push(...rawInfo.download);
+                        } else if (rawInfo.download) {
+                            downloadUrls.push(rawInfo.download);
+                        }
+                        if (this.getDownloadUrlForPlatform(downloadUrls)) {
+                            updateInfo.update = rawInfo;
+                            return updateInfo;
+                        }
                     }
                 } catch {
                     // pass

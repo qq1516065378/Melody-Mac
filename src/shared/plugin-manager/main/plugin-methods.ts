@@ -7,6 +7,7 @@ import axios from "axios";
 import https from "https";
 import { addFileScheme, safeStat } from "@/common/file-util";
 import path from "path";
+import { CommentSortType, getBuiltinComments } from "./internal-plugins/builtin-comments";
 
 // Ensure axios uses the same HTTPS agent configuration (ignore self-signed certs)
 axios.defaults.httpsAgent = new https.Agent({
@@ -679,16 +680,23 @@ export default class PluginMethods implements IPlugin.IPluginInstanceMethods {
         }
     }
 
-    async getMusicComments(musicItem: IMusic.IMusicItem, page = 1): Promise<IPlugin.IGetCommentResult> {
+    async getMusicComments(musicItem: IMusic.IMusicItem, page = 1, sortType: CommentSortType = "hot"): Promise<IPlugin.IGetCommentResult> {
+        // 1. 优先尝试插件自身的评论接口（只传 musicItem 和 page，保持向后兼容）
         try {
             const result = await this.plugin.instance?.getMusicComments?.(
                 musicItem,
                 page,
             );
-            if (!result) {
-                throw new Error();
+            if (result && result.data && result.data.length > 0) {
+                return result;
             }
-            return result;
+        } catch (e: any) {
+            // 插件自身失败，继续走兜底
+        }
+
+        // 2. 插件无评论时，使用内置网易云音乐评论兜底（支持排序类型）
+        try {
+            return await getBuiltinComments(musicItem, page, sortType);
         } catch (e: any) {
             return {
                 isEnd: true,

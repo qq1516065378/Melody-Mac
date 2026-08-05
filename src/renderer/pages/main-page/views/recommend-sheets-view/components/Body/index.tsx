@@ -21,6 +21,18 @@ export function getDefaultTag(): IMedia.IUnique {
     };
 }
 
+// 基于日期的伪随机哈希，用于每日轮换歌单
+function getDailyOffset(seed: string, totalLength: number): number {
+    if (totalLength <= 5) return 0;
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+        const char = seed.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return Math.abs(hash) % Math.max(1, totalLength - 4);
+}
+
 interface IBodyProps {
     plugin: IPlugin.IPluginDelegate;
 }
@@ -54,8 +66,25 @@ export default function Body(props: IBodyProps) {
         );
     }
 
-    const featuredSheets = sheets?.slice(0, 5) ?? [];
-    const remainingSheets = sheets?.length > 5 ? sheets.slice(5) : sheets;
+    // 计算每日轮换的歌单
+    const [dailyOffset, setDailyOffset] = useState(0);
+    
+    useEffect(() => {
+        if (plugin && selectedTag) {
+            const today = new Date().toISOString().split("T")[0];
+            const seed = `${today}-${plugin.platform}-${selectedTag.id}`;
+            const offset = getDailyOffset(seed, sheets?.length ?? 0);
+            setDailyOffset(offset);
+        }
+    }, [plugin, selectedTag, sheets?.length]);
+
+    // 应用轮换偏移
+    const rotatedSheets = sheets && sheets.length > 5
+        ? [...sheets.slice(dailyOffset), ...sheets.slice(0, dailyOffset)]
+        : sheets;
+
+    const featuredSheets = rotatedSheets?.slice(0, 5) ?? [];
+    const remainingSheets = rotatedSheets?.length > 5 ? rotatedSheets.slice(5) : rotatedSheets;
 
     useEffect(() => {
         if (tags) {
