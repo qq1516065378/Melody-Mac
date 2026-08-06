@@ -1,14 +1,14 @@
 {
-  "version": "1.0.7",
+  "version": "1.0.8",
   "changeLog": [
-    "【紧急修复】macOS关闭窗口后无法从Dock/托盘重新打开的问题",
-    "【修复】macOS托盘图标单击即可显示主窗口（之前仅响应双击）",
-    "【修复】macOS点击Dock图标总能重新打开主窗口（之前有歌词窗口时无法打开）",
-    "【修复】macOS关闭窗口行为符合系统规范：关闭按钮隐藏窗口而非销毁",
-    "【修复】DMG安装包支持标准拖拽安装界面",
-    "【修复】自动更新自动安装：下载后自动复制到/Applications并重启"
+    "【紧急修复】macOS Cmd+Q/Dock右键退出无响应的问题",
+    "【修复】macOS关闭窗口后点击Dock/托盘图标可正常重新打开",
+    "【修复】macOS托盘图标单击即可显示主窗口",
+    "【修复】第三方音源插件卡死（如元力WY）导致播放无响应的问题：插件方法调用增加15秒超时保护",
+    "【优化】自动更新改用ZIP格式下载，无需挂载DMG，自动解压安装更可靠",
+    "【修复】DMG安装包标准拖拽安装界面"
   ],
   "download": [
-    "https://github.com/qq1516065378/Melody-Mac/releases/download/v1.0.7/Melody-1.0.7.dmg"
+    "https://github.com/qq1516065378/Melody-Mac/releases/download/v1.0.8/Melody-1.0.8.zip"
   ]
 }

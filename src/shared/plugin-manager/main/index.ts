@@ -135,7 +135,7 @@ class PluginManager {
         this.inited = true;
     }
 
-    // 调用某个插件的方法
+    // 调用某个插件的方法（带超时保护，防止插件卡住导致界面无响应）
     private callPluginMethod({
         hash,
         platform,
@@ -154,7 +154,26 @@ class PluginManager {
         if (!plugin) {
             return null;
         }
-        return plugin.methods[method]?.apply?.({ plugin }, args);
+        const methodFn = plugin.methods[method];
+        if (!methodFn) {
+            return null;
+        }
+
+        // 对插件方法调用加超时保护（15秒），防止插件Promise永不resolve导致界面卡死
+        const result = methodFn.apply({ plugin }, args);
+        if (result instanceof Promise) {
+            const timeoutMs = method === "getMediaSource" ? 15000 : 30000;
+            return Promise.race([
+                result,
+                new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error(`Plugin method ${method} timed out after ${timeoutMs}ms`)), timeoutMs),
+                ),
+            ]).catch((e) => {
+                console.warn(`[Plugin:${plugin.name}] ${method} failed:`, e?.message || e);
+                return null;
+            });
+        }
+        return result;
     }
 
     private syncPlugins() {

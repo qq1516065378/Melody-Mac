@@ -28,6 +28,14 @@ class WindowManager implements IWindowManager {
     private static mainWindow: BrowserWindow | null = null;
     private static lrcWindow: BrowserWindow | null = null;
     private static miniModeWindow: BrowserWindow | null = null;
+    private static isQuitting = false;
+
+    constructor() {
+        // 监听应用退出事件：当app.quit()被调用时，允许窗口正常关闭
+        app.on("before-quit", () => {
+            WindowManager.isQuitting = true;
+        });
+    }
 
     private ee: EventEmitter = new EventEmitter();
 
@@ -173,6 +181,10 @@ class WindowManager implements IWindowManager {
         );
 
         mainWindow.on("close", (e) => {
+            // 如果应用正在退出（Cmd+Q/Dock退出），允许窗口正常关闭
+            if (WindowManager.isQuitting) {
+                return;
+            }
             const closeBehavior = AppConfig.getConfig("normal.closeBehavior");
             if (closeBehavior === "minimize") {
                 e.preventDefault();

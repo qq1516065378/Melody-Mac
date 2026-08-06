@@ -34,15 +34,23 @@ class Utils {
         // 检查是否为Windows平台的安装包（避免darwin误匹配：d-a-r-**w-i-n**）
         const isWindowsPackage = (url: string) => /(win32|win64|windows|-win\b|\/win\b)/i.test(url);
 
+        if (platform === "darwin") {
+            // Mac: 优先ZIP（自动解压安装更可靠），其次DMG，最后PKG
+            const macCompatible = downloadUrls.filter(url => {
+                const lowerUrl = url.toLowerCase();
+                return (lowerUrl.endsWith(".zip") || lowerUrl.endsWith(".dmg") || lowerUrl.endsWith(".pkg"))
+                    && !isWindowsPackage(url);
+            });
+            // ZIP优先
+            const zipUrl = macCompatible.find(u => u.toLowerCase().endsWith(".zip"));
+            if (zipUrl) return zipUrl;
+            const dmgUrl = macCompatible.find(u => u.toLowerCase().endsWith(".dmg"));
+            if (dmgUrl) return dmgUrl;
+            return macCompatible[0] || null;
+        }
+
         for (const url of downloadUrls) {
             const lowerUrl = url.toLowerCase();
-            if (platform === "darwin") {
-                // Mac: dmg, pkg, zip（排除Windows包）
-                const isMacCompatible = lowerUrl.endsWith(".dmg") || lowerUrl.endsWith(".pkg") || lowerUrl.endsWith(".zip");
-                if (isMacCompatible && !isWindowsPackage(url)) {
-                    return url;
-                }
-            }
             if (platform === "win32") {
                 if (lowerUrl.endsWith(".exe") || lowerUrl.includes("setup") || (lowerUrl.endsWith(".zip") && isWindowsPackage(url))) {
                     return url;
@@ -54,7 +62,6 @@ class Utils {
                 }
             }
         }
-        // 没有找到匹配当前平台的安装包
         return null;
     }
 
@@ -164,7 +171,63 @@ class Utils {
         }
     }
 
-    private async installMacOSUpdate(dmgPath: string): Promise<boolean> {
+    private async installMacOSZipUpdate(zipPath: string): Promise<boolean> {
+        const appName = path.basename(app.getPath("exe")).replace(/\.app\/.*/, ".app");
+        const targetAppPath = `/Applications/${appName}`;
+        const tempExtractDir = path.join(app.getPath("temp"), `melody-update-${Date.now()}`);
+
+        try {
+            // 1. 创建临时解压目录
+            await fs.mkdir(tempExtractDir, { recursive: true });
+
+            // 2. 解压 ZIP（使用 ditto，macOS自带，保留元数据）
+            execSync(`ditto -x -k "${zipPath}" "${tempExtractDir}"`, { timeout: 60000 });
+
+            // 3. 在解压目录中找到 .app（可能在子目录中）
+            const findApp = (dir: string): string | null => {
+                const entries = execSync(`ls "${dir}"`, { encoding: "utf-8" }).split("\n").filter(Boolean);
+                for (const entry of entries) {
+                    const fullPath = path.join(dir, entry);
+                    if (entry.endsWith(".app")) {
+                        return fullPath;
+                    }
+                    try {
+                        const stat = execSync(`test -d "${fullPath}" && echo yes || echo no`, { encoding: "utf-8" }).trim();
+                        if (stat === "yes") {
+                            const found = findApp(fullPath);
+                            if (found) return found;
+                        }
+                    } catch {}
+                }
+                return null;
+            };
+            const sourceAppPath = findApp(tempExtractDir);
+            if (!sourceAppPath) {
+                throw new Error("ZIP中未找到.app文件");
+            }
+
+            // 4. 如果目标位置已有旧版，先删除
+            if (existsSync(targetAppPath)) {
+                await fs.rm(targetAppPath, { recursive: true, force: true });
+            }
+
+            // 5. 使用 ditto 复制新 .app 到 /Applications（保留代码签名）
+            execSync(`ditto "${sourceAppPath}" "${targetAppPath}"`, { timeout: 60000 });
+
+            // 6. 清理临时文件
+            await fs.rm(tempExtractDir, { recursive: true, force: true }).catch(() => {});
+            await fs.unlink(zipPath).catch(() => {});
+
+            return true;
+        } catch (e: any) {
+            console.error("macOS ZIP update install failed:", e);
+            // 清理临时目录
+            await fs.rm(tempExtractDir, { recursive: true, force: true }).catch(() => {});
+            return false;
+        }
+    }
+
+    private async installMacOSDmgUpdate(dmgPath: string): Promise<boolean> {
         const appName = path.basename(app.getPath("exe")).replace(/\.app\/.*/, ".app");
         const targetAppPath = `/Applications/${appName}`;
 
@@ -207,7 +270,7 @@ class Utils {
 
             return true;
         } catch (e: any) {
-            console.error("macOS update install failed:", e);
+            console.error("macOS DMG update install failed:", e);
             return false;
         }
     }
@@ -223,32 +286,34 @@ class Utils {
         setTimeout(async () => {
             if (platform === "darwin") {
                 const ext = path.extname(filePath).toLowerCase();
-                if (ext === ".dmg") {
-                    // DMG: 自动挂载、复制到/Applications、重启
-                    const success = await this.installMacOSUpdate(filePath);
-                    if (success) {
-                        // 启动新版本
-                        const appName = path.basename(app.getPath("exe")).replace(/\.app\/.*/, ".app");
-                        const newAppPath = `/Applications/${appName}`;
-                        spawn("open", [newAppPath], {
-                            detached: true,
-                            stdio: "ignore",
-                        });
-                        app.quit();
-                    } else {
-                        // 自动安装失败，退回到打开DMG让用户手动安装
-                        shell.openPath(filePath);
-                        dialog.showMessageBox({
-                            type: "info",
-                            title: "更新已下载",
-                            message: "请将Melody.app拖拽到Applications文件夹完成安装",
-                            detail: "自动安装失败，已为您打开DMG安装包。",
-                        });
-                        app.quit();
-                    }
+                let success = false;
+
+                if (ext === ".zip") {
+                    success = await this.installMacOSZipUpdate(filePath);
+                } else if (ext === ".dmg") {
+                    success = await this.installMacOSDmgUpdate(filePath);
+                }
+
+                if (success) {
+                    // 启动新版本
+                    const appName = path.basename(app.getPath("exe")).replace(/\.app\/.*/, ".app");
+                    const newAppPath = `/Applications/${appName}`;
+                    spawn("open", [newAppPath], {
+                        detached: true,
+                        stdio: "ignore",
+                    });
+                    app.quit();
                 } else {
-                    // ZIP/PKG等其他格式：打开文件让用户手动处理
+                    // 自动安装失败，打开文件让用户手动处理
                     shell.openPath(filePath);
+                    dialog.showMessageBox({
+                        type: "info",
+                        title: "更新已下载",
+                        message: ext === ".dmg"
+                            ? "请将Melody.app拖拽到Applications文件夹完成安装"
+                            : "请解压后将Melody.app复制到Applications文件夹",
+                        detail: "自动安装失败，已为您打开下载文件。",
+                    });
                     app.quit();
                 }
             } else if (platform === "win32") {
