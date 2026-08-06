@@ -1,11 +1,12 @@
 import { app, BrowserWindow, dialog, ipcMain, shell, net } from "electron";
 import { IWindowManager } from "@/types/main/window-manager";
 import fs from "fs/promises";
-import { createWriteStream } from "fs";
+import { createWriteStream, existsSync } from "fs";
 import path from "path";
 import { appUpdateSources } from "@/common/constant";
 import axios from "axios";
 import { compare } from "compare-versions";
+import { execSync, spawn } from "child_process";
 
 class Utils {
     private windowManager: IWindowManager;
@@ -163,6 +164,54 @@ class Utils {
         }
     }
 
+    private async installMacOSUpdate(dmgPath: string): Promise<boolean> {
+        const appName = path.basename(app.getPath("exe")).replace(/\.app\/.*/, ".app");
+        const targetAppPath = `/Applications/${appName}`;
+
+        try {
+            // 1. 挂载 DMG
+            const attachOutput = execSync(`hdiutil attach "${dmgPath}" -nobrowse -readonly`, {
+                encoding: "utf-8",
+                timeout: 30000,
+            });
+
+            // 解析挂载点
+            const mountMatch = attachOutput.match(/\/Volumes\/[^\n]+/);
+            if (!mountMatch) {
+                throw new Error("无法挂载DMG镜像");
+            }
+            const mountPoint = mountMatch[0].trim();
+
+            // 2. 在挂载卷中找到 .app
+            const volumeContents = execSync(`ls "${mountPoint}"`, { encoding: "utf-8" });
+            const appMatch = volumeContents.match(/[^\n]+\.app/);
+            if (!appMatch) {
+                execSync(`hdiutil detach "${mountPoint}" -force`, { stdio: "pipe" });
+                throw new Error("DMG中未找到应用");
+            }
+            const sourceAppPath = path.join(mountPoint, appMatch[0].trim());
+
+            // 3. 如果目标位置已有旧版，先删除
+            if (existsSync(targetAppPath)) {
+                await fs.rm(targetAppPath, { recursive: true, force: true });
+            }
+
+            // 4. 使用 ditto 复制新 .app 到 /Applications（保留代码签名）
+            execSync(`ditto "${sourceAppPath}" "${targetAppPath}"`, { timeout: 60000 });
+
+            // 5. 卸载 DMG
+            execSync(`hdiutil detach "${mountPoint}" -force`, { stdio: "pipe" });
+
+            // 6. 清理下载的 DMG
+            await fs.unlink(dmgPath).catch(() => {});
+
+            return true;
+        } catch (e: any) {
+            console.error("macOS update install failed:", e);
+            return false;
+        }
+    }
+
     private installUpdate() {
         if (!this.downloadedUpdatePath) {
             return;
@@ -171,18 +220,46 @@ class Utils {
         const filePath = this.downloadedUpdatePath;
         const platform = process.platform;
 
-        setTimeout(() => {
+        setTimeout(async () => {
             if (platform === "darwin") {
-                // macOS: open DMG to mount it
-                shell.openPath(filePath);
+                const ext = path.extname(filePath).toLowerCase();
+                if (ext === ".dmg") {
+                    // DMG: 自动挂载、复制到/Applications、重启
+                    const success = await this.installMacOSUpdate(filePath);
+                    if (success) {
+                        // 启动新版本
+                        const appName = path.basename(app.getPath("exe")).replace(/\.app\/.*/, ".app");
+                        const newAppPath = `/Applications/${appName}`;
+                        spawn("open", [newAppPath], {
+                            detached: true,
+                            stdio: "ignore",
+                        });
+                        app.quit();
+                    } else {
+                        // 自动安装失败，退回到打开DMG让用户手动安装
+                        shell.openPath(filePath);
+                        dialog.showMessageBox({
+                            type: "info",
+                            title: "更新已下载",
+                            message: "请将Melody.app拖拽到Applications文件夹完成安装",
+                            detail: "自动安装失败，已为您打开DMG安装包。",
+                        });
+                        app.quit();
+                    }
+                } else {
+                    // ZIP/PKG等其他格式：打开文件让用户手动处理
+                    shell.openPath(filePath);
+                    app.quit();
+                }
             } else if (platform === "win32") {
                 // Windows: run the installer
                 shell.openPath(filePath);
+                app.quit();
             } else {
                 // Linux: open the file
                 shell.openPath(filePath);
+                app.quit();
             }
-            app.quit();
         }, 500);
     }
 

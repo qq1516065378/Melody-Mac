@@ -1,15 +1,12 @@
 {
-  "version": "1.0.5",
+  "version": "1.0.6",
   "changeLog": [
-    "【紧急修复】修复macOS自动更新检测失败的问题：平台过滤逻辑中darwin包含win子串导致所有安装包被误过滤",
-    "【修复】评论功能修复：新增内置网易云音乐评论兜底，无插件支持时也能查看评论",
-    "【功能】评论区新增热门/最新排序切换",
-    "【修复】点击其他功能时评论面板自动收起，再次点击评论按钮可关闭面板",
-    "【优化】DMG打包方案：使用hdiutil替代不兼容的MakerDMG，解决Node.js v22+打包失败问题",
-    "【优化】推荐歌单每日自动轮换，发现更多音乐",
-    "【修复】托盘图标退出功能无效的问题"
+    "【修复】DMG安装包支持标准拖拽安装，打开后可直接拖到Applications文件夹",
+    "【修复】自动更新改为应用内自动安装：下载完成后自动复制到/Applications并重启，无需手动拖拽",
+    "【修复】下载模块改用Electron内置net模块，解决网络代理和重定向导致的下载失败",
+    "【修复】macOS平台过滤逻辑bug（darwin误匹配win子串导致无法检测更新）"
   ],
   "download": [
-    "https://github.com/qq1516065378/Melody-Mac/releases/download/v1.0.5/Melody-1.0.5.dmg"
+    "https://github.com/qq1516065378/Melody-Mac/releases/download/v1.0.6/Melody-1.0.6.dmg"
   ]
 }
