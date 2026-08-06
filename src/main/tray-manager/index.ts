@@ -41,16 +41,6 @@ class TrayManager {
             }),
         );
 
-        if (process.platform === "linux") {
-            tray.on("click", () => {
-                windowManager.showMainWindow();
-            });
-        } else {
-            tray.on("double-click", () => {
-                windowManager.showMainWindow();
-            });
-        }
-
         let debugClickCount = 0;
         let debugClickTime = 0;
 
@@ -72,7 +62,16 @@ class TrayManager {
             }
         };
 
-        tray.on("click", debugModeHandler);
+        // 单击托盘图标显示主窗口
+        tray.on("click", () => {
+            debugModeHandler();
+            windowManager.showMainWindow();
+        });
+
+        // 双击托盘图标也显示主窗口（Windows/Linux习惯）
+        tray.on("double-click", () => {
+            windowManager.showMainWindow();
+        });
 
         // 配置变化时更新菜单
         AppConfig.onConfigUpdated((changedConfig) => {

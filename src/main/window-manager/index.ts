@@ -173,10 +173,15 @@ class WindowManager implements IWindowManager {
         );
 
         mainWindow.on("close", (e) => {
-            if (process.platform === "win32" && AppConfig.getConfig("normal.closeBehavior") === "minimize") {
+            const closeBehavior = AppConfig.getConfig("normal.closeBehavior");
+            if (closeBehavior === "minimize") {
                 e.preventDefault();
                 mainWindow.hide();
-                mainWindow.setSkipTaskbar(true);
+                // 只在Windows上设置skipTaskbar（从任务栏隐藏）
+                // macOS保持在Dock中，点击Dock图标可重新打开
+                if (process.platform === "win32") {
+                    mainWindow.setSkipTaskbar(true);
+                }
             }
         });
 

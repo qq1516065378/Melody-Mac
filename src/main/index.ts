@@ -85,11 +85,8 @@ app.on("window-all-closed", () => {
 });
 
 app.on("activate", () => {
-    // On OS X it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) {
-        windowManager.showMainWindow();
-    }
+    // macOS: 点击Dock图标时总是显示主窗口（即使有其他窗口如歌词窗口存在）
+    windowManager.showMainWindow();
 });
 
 if (!app.requestSingleInstanceLock()) {
