@@ -24,6 +24,7 @@ class AudioController extends ControllerBase implements IAudioController {
     private effectProcessor: AudioEffectProcessor | null = null;
     private effectSettings = DEFAULT_AUDIO_EFFECT_SETTINGS;
     private sinkId = "";
+    private loadTimeoutId: number | null = null;
 
     private _playerState: PlayerState = PlayerState.None;
     get playerState() {
@@ -51,6 +52,7 @@ class AudioController extends ControllerBase implements IAudioController {
 
         ////// events
         this.audio.onplaying = () => {
+            this.clearLoadTimeout();
             this.playerState = PlayerState.Playing;
             navigator.mediaSession.playbackState = "playing";
         };
@@ -61,6 +63,7 @@ class AudioController extends ControllerBase implements IAudioController {
         };
 
         this.audio.onerror = (event) => {
+            this.clearLoadTimeout();
             this.playerState = PlayerState.Paused;
             navigator.mediaSession.playbackState = "paused";
             this.onError?.(ErrorReason.EmptyResource, event as any);
@@ -97,6 +100,25 @@ class AudioController extends ControllerBase implements IAudioController {
 
         // @ts-ignore  isDev
         window.ad = this.audio;
+    }
+
+    /** 设置音频加载超时（30秒内既不playing也不error则视为失败） */
+    private startLoadTimeout() {
+        this.clearLoadTimeout();
+        this.loadTimeoutId = window.setTimeout(() => {
+            console.warn("[AudioController] Track load timeout, triggering error");
+            this.clearLoadTimeout();
+            this.playerState = PlayerState.Paused;
+            navigator.mediaSession.playbackState = "paused";
+            this.onError?.(ErrorReason.EmptyResource, new Error("Audio load timeout after 30s"));
+        }, 30000);
+    }
+
+    private clearLoadTimeout() {
+        if (this.loadTimeoutId !== null) {
+            window.clearTimeout(this.loadTimeoutId);
+            this.loadTimeoutId = null;
+        }
     }
 
     private initHls(config?: Partial<HlsConfig>) {
@@ -139,6 +161,7 @@ class AudioController extends ControllerBase implements IAudioController {
     }
 
     reset(): void {
+        this.clearLoadTimeout();
         this.playerState = PlayerState.None;
         this.audio.src = "";
         this.audio.removeAttribute("src");
@@ -208,6 +231,7 @@ class AudioController extends ControllerBase implements IAudioController {
 
     setTrackSource(trackSource: IMusic.IMusicSource, musicItem: IMusic.IMusicItem): void {
         this.musicItem = { ...musicItem };
+        this.clearLoadTimeout();
 
         // 1. update metadata
         navigator.mediaSession.metadata = new MediaMetadata({
@@ -224,7 +248,6 @@ class AudioController extends ControllerBase implements IAudioController {
 
         // 2. convert url and headers
         let url = trackSource.url;
-        const urlObj = new URL(trackSource.url);
         let headers: Record<string, any> | null = null;
 
         // 2.1 convert user agent
@@ -236,19 +259,24 @@ class AudioController extends ControllerBase implements IAudioController {
         }
 
         // 2.2 convert auth header
-        if (urlObj.username && urlObj.password) {
-            const authHeader = `Basic ${btoa(
-                `${decodeURIComponent(urlObj.username)}:${decodeURIComponent(
-                    urlObj.password,
-                )}`,
-            )}`;
-            urlObj.username = "";
-            urlObj.password = "";
-            headers = {
-                ...(headers || {}),
-                Authorization: authHeader,
-            };
-            url = urlObj.toString();
+        try {
+            const urlObj = new URL(trackSource.url);
+            if (urlObj.username && urlObj.password) {
+                const authHeader = `Basic ${btoa(
+                    `${decodeURIComponent(urlObj.username)}:${decodeURIComponent(
+                        urlObj.password,
+                    )}`,
+                )}`;
+                urlObj.username = "";
+                urlObj.password = "";
+                headers = {
+                    ...(headers || {}),
+                    Authorization: authHeader,
+                };
+                url = urlObj.toString();
+            }
+        } catch {
+            // URL parse error, use original url
         }
 
         // 2.3 hack url with headers
@@ -268,27 +296,48 @@ class AudioController extends ControllerBase implements IAudioController {
             return;
         }
 
+        // 启动加载超时（30秒）
+        this.startLoadTimeout();
+
         // 3. set real source
-        if (getUrlExt(trackSource.url) === ".m3u8") {
+        const originalUrl = trackSource.url;
+        if (getUrlExt(originalUrl) === ".m3u8") {
             if (Hls.isSupported()) {
                 this.initHls();
                 this.hls.loadSource(url);
             } else {
+                this.clearLoadTimeout();
                 this.onError(ErrorReason.UnsupportedResource);
                 return;
             }
         } else if (headers) {
+            // 有自定义headers（如Authorization），用fetch获取blob
+            const controller = new AbortController();
+            const fetchTimeoutId = window.setTimeout(() => controller.abort(), 30000);
+
             fetch(url, {
                 method: "GET",
                 headers: {
-                    ...trackSource.headers,
+                    ...headers,
                 },
+                signal: controller.signal,
             })
                 .then(async (res) => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP ${res.status}`);
+                    }
                     const blob = await res.blob();
                     if (isSameMedia(this.musicItem, musicItem)) {
                         this.audio.src = URL.createObjectURL(blob);
                     }
+                })
+                .catch((err) => {
+                    console.warn("[AudioController] Fetch track failed:", err?.message || err);
+                    this.clearLoadTimeout();
+                    this.onError?.(ErrorReason.EmptyResource, err);
+                })
+                .finally(() => {
+                    window.clearTimeout(fetchTimeoutId);
                 });
         } else {
             this.audio.src = url;

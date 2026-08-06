@@ -155,25 +155,36 @@ class PluginManager {
             return null;
         }
         const methodFn = plugin.methods[method];
-        if (!methodFn) {
+        if (!methodFn || typeof methodFn !== "function") {
             return null;
         }
 
-        // 对插件方法调用加超时保护（15秒），防止插件Promise永不resolve导致界面卡死
-        const result = methodFn.apply({ plugin }, args);
-        if (result instanceof Promise) {
-            const timeoutMs = method === "getMediaSource" ? 15000 : 30000;
-            return Promise.race([
-                result,
-                new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error(`Plugin method ${method} timed out after ${timeoutMs}ms`)), timeoutMs),
-                ),
-            ]).catch((e) => {
-                console.warn(`[Plugin:${plugin.name}] ${method} failed:`, e?.message || e);
-                return null;
-            });
+        // 超时保护：getMediaSource 15秒，其他方法30秒
+        const timeoutMs = method === "getMediaSource" ? 15000 : 30000;
+
+        try {
+            // 直接调用plugin.methods上的方法，保持正确的this绑定
+            const result = methodFn.call(plugin.methods, ...args);
+
+            if (result instanceof Promise) {
+                return Promise.race([
+                    result,
+                    new Promise((_, reject) =>
+                        setTimeout(
+                            () => reject(new Error(`Plugin method ${method} timed out after ${timeoutMs}ms`)),
+                            timeoutMs,
+                        ),
+                    ),
+                ]).catch((e) => {
+                    console.warn(`[Plugin:${plugin.name}] ${method} failed:`, e?.message || e);
+                    return null;
+                });
+            }
+            return result;
+        } catch (e: any) {
+            console.warn(`[Plugin:${plugin.name}] ${method} threw synchronously:`, e?.message || e);
+            return null;
         }
-        return result;
     }
 
     private syncPlugins() {
